@@ -1,4 +1,4 @@
-# TeleAlien
+# TeleAlien----An easy AI Telegram chat bot  
 
 [繁體中文](#繁體中文) · [English](#english)  
 v1.0版本 可用but緩慢施工中  
