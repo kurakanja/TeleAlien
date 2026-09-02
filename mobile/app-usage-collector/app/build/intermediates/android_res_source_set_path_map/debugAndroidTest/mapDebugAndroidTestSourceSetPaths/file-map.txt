@@ -1,0 +1,6 @@
+local.telealien.appusage.test.app-androidTest-0 D:\cyberboss\mobile\app-usage-collector\app\build\generated\res\resValues\androidTest\debug
+local.telealien.appusage.test.app-updated_navigation_xml-1 D:\cyberboss\mobile\app-usage-collector\app\build\generated\updated_navigation_xml\debugAndroidTest
+local.telealien.appusage.test.app-mergeDebugAndroidTestResources-2 D:\cyberboss\mobile\app-usage-collector\app\build\intermediates\incremental\debugAndroidTest\mergeDebugAndroidTestResources\merged.dir
+local.telealien.appusage.test.app-mergeDebugAndroidTestResources-3 D:\cyberboss\mobile\app-usage-collector\app\build\intermediates\incremental\debugAndroidTest\mergeDebugAndroidTestResources\stripped.dir
+local.telealien.appusage.test.app-debugAndroidTest-4 D:\cyberboss\mobile\app-usage-collector\app\build\intermediates\merged_res\debugAndroidTest\mergeDebugAndroidTestResources
+gradleHome-0 C:\Users\user\.gradle

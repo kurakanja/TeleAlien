@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="local.telealien.appusage.test" >
+
+    <uses-sdk
+        android:minSdkVersion="26"
+        android:targetSdkVersion="35" />
+
+    <instrumentation
+        android:name="android.test.InstrumentationTestRunner"
+        android:functionalTest="false"
+        android:handleProfiling="false"
+        android:label="Tests for local.telealien.appusage"
+        android:targetPackage="local.telealien.appusage" />
+
+    <application
+        android:debuggable="true"
+        android:extractNativeLibs="false" />
+
+</manifest>
