@@ -7,7 +7,7 @@
 <a id="繁體中文"></a>
 
 ## 繁體中文
-
+**Telegram + Alien 你的tg專屬小外星人**
 TeleAlien 是一個只供自己私訊使用的 Telegram + Gemini 助手。它可維持短期對話脈絡、讀寫共同記憶、建立提醒，並可選擇搭配 Android 收集器記錄手機前景 App 使用情況。
 
 > Android 監控器是**可選功能**。不安裝 APK 時，Telegram Bot、角色設定、共同記憶、提醒與一般主動關心都能正常使用。
