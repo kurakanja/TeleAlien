@@ -1,0 +1,16 @@
+{
+  "current": {
+    "packageName": "com.example.second",
+    "appName": "Example Second",
+    "startedAt": 1786161900000
+  },
+  "closed": [
+    {
+      "packageName": "com.example.first",
+      "appName": "Example First",
+      "startedAt": 1786161600000,
+      "endedAt": 1786161900000,
+      "synced": false
+    }
+  ]
+}
