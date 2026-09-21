@@ -54,12 +54,12 @@ npm run start
 ```bash
 cd ~/telealien
 git pull --ff-only origin main
-npm ci
+npm ci --allow-git=all
 pkill -f 'telealien.js' || true
 bash scripts/termux/start-telealien.sh
 ```
 
-`.env` 被 Git 忽略，因此不會被此流程覆寫。`git pull --ff-only` 若因 Termux 程式檔案的未提交變更而失敗，先用 `git status` 查看並處理該些變更，不要強制覆寫。
+`.env` 被 Git 忽略，因此不會被此流程覆寫。新版 npm 預設拒絕 Git 來源套件，因此 `--allow-git=all` 只在這次安裝時允許本專案鎖定的 GitHub 時間軸套件；不會更改全域 npm 設定。`git pull --ff-only` 若因 Termux 程式檔案的未提交變更而失敗，先用 `git status` 查看並處理該些變更，不要強制覆寫。
 
 ### 設定 `.env`
 
@@ -208,12 +208,12 @@ After `git push origin main` on your computer, run in Termux:
 ```bash
 cd ~/telealien
 git pull --ff-only origin main
-npm ci
+npm ci --allow-git=all
 pkill -f 'telealien.js' || true
 bash scripts/termux/start-telealien.sh
 ```
 
-Git ignores `.env`, so this does not overwrite credentials. If `git pull --ff-only` fails because there are local code changes, inspect them with `git status` and resolve them first; do not force-overwrite them.
+Git ignores `.env`, so this does not overwrite credentials. Newer npm versions reject Git dependencies by default, so `--allow-git=all` permits this project's pinned GitHub timeline package only for this install; it does not change global npm configuration. If `git pull --ff-only` fails because there are local code changes, inspect them with `git status` and resolve them first; do not force-overwrite them.
 
 Edit `.env` with `nano .env`. Never commit it: it contains private credentials.
 
