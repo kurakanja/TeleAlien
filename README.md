@@ -1,12 +1,13 @@
-# TeleAlien
+# TeleAlien----An easy AI Telegram chat bot  
 
-[繁體中文](#繁體中文) · [English](#english)
-
+[繁體中文](#繁體中文) · [English](#english)  
+v1.0版本 可用but緩慢施工中  
 ---
 
 <a id="繁體中文"></a>
 
 ## 繁體中文
+**Telegram + Alien 你的tg專屬小外星人**  
 
 TeleAlien 是一個只供自己私訊使用的 Telegram + Gemini 助手。它可維持短期對話脈絡、讀寫共同記憶、建立提醒，並可選擇搭配 Android 收集器記錄手機前景 App 使用情況。
 
@@ -62,7 +63,7 @@ bash scripts/termux/start-telealien.sh
 
 ### 設定 `.env`
 
-使用 `nano .env` 編輯。**絕對不要上傳 `.env` 到 GitHub**，裡面有 Bot token 和 Gemini API key。
+使用 `nano .env` 編輯。
 
 ```dotenv
 TELEGRAM_BOT_TOKEN=從BotFather取得的token
@@ -98,14 +99,15 @@ bash scripts/termux/start-telealien.sh
 
 ### 角色與共同記憶：直接在手機檔案管理員編輯
 
-可保留原本的 `gemini-character.md` 和 `gemini-user.md`，將它們放在手機共用儲存空間，例如「我的檔案」可見的 `TeleAlien` 資料夾。再在 `.env` 指向這兩個**既有檔案**：
+可保留原本的 `gemini-character.md` 和 `gemini-user.md`，將它們放在手機共用儲存空間，例如「我的檔案」可見的 `TeleAlien` 資料夾。再在 `.env` 指向這兩個**既有檔案**：  
+以下範例為將檔案放在三星內部儲存空間資料夾中  
 
 ```dotenv
 TELEALIEN_CHARACTER_FILE=/data/data/com.termux/files/home/storage/shared/TeleAlien/gemini-character.md
 TELEALIEN_USER_FILE=/data/data/com.termux/files/home/storage/shared/TeleAlien/gemini-user.md
 ```
 
-這樣你在 Samsung「我的檔案」修改的檔案，就是 AI 實際讀取與寫入的檔案；不需要軟連結。AI 更新共同記憶時，會把舊版保存為同資料夾的 `gemini-user.md.bak`。
+這樣你在「我的檔案」修改的檔案，就是 AI 實際讀取與寫入的檔案；不需要軟連結。AI 更新共同記憶時，會把舊版保存為同資料夾的 `gemini-user.md.bak`。
 
 若偏好軟連結，兩種方式擇一：不要同時在 `.env` 指定上述外部路徑。
 
