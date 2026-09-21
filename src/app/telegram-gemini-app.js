@@ -168,7 +168,8 @@ class TelegramGeminiApp {
     const schedule = async () => {
       const min = Number(match[1]); const max = Number(match[2]);
       await wait((min + Math.floor(Math.random() * (max - min + 1))) * 60_000);
-      for (const userId of this.config.allowedUserIds) await this.reply(String(userId), "\u8acb\u4e3b\u52d5\u95dc\u5fc3\u6211\u4e00\u4e0b\uff1b\u5982\u679c\u6c92\u6709\u5fc5\u8981\uff0c\u7c21\u77ed\u5730\u8aaa\u8072\u554f\u5019\u5373\u53ef\u3002");
+      const trigger = `[\u7cfb\u7d71\u63d0\u793a:\u73fe\u5728\u662f${formatLocalTime(Date.now(), this.config.timeZone)}\uff0c\u662f\u6642\u5019\u767c\u8a0a\u606f\u7d66\u672c\u9ad4\u4e86]`;
+      for (const userId of this.config.allowedUserIds) await this.reply(String(userId), trigger);
       if (this.running) void schedule();
     };
     void schedule();

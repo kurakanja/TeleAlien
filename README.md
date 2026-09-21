@@ -46,6 +46,20 @@ bash scripts/termux/start-telealien.sh
 npm run start
 ```
 
+### 從 GitHub 更新到 Termux
+
+在電腦 `git push origin main` 後，打開 Termux 執行：
+
+```bash
+cd ~/telealien
+git pull --ff-only origin main
+npm ci
+pkill -f 'telealien.js' || true
+bash scripts/termux/start-telealien.sh
+```
+
+`.env` 被 Git 忽略，因此不會被此流程覆寫。`git pull --ff-only` 若因 Termux 程式檔案的未提交變更而失敗，先用 `git status` 查看並處理該些變更，不要強制覆寫。
+
 ### 設定 `.env`
 
 使用 `nano .env` 編輯。**絕對不要上傳 `.env` 到 GitHub**，裡面有 Bot token 和 Gemini API key。
@@ -157,7 +171,7 @@ tail -f ~/.telealien/termux.log
 
 TeleAlien 使用 Telegram Bot API 長輪詢、Gemini API、Node.js 與本機 JSON 狀態檔。Android 收集器以 Usage Access 讀取前景 App，只 POST 到同手機的 `127.0.0.1`，不會主動把使用資料傳到外部伺服器。
 
-本專案改寫自 [WenXiaoWendy/cyberboss](https://github.com/WenXiaoWendy/cyberboss)，時間軸功能使用 [WenXiaoWendy/timeline-for-agent](https://github.com/WenXiaoWendy/timeline-for-agent)。感謝原作者與貢獻者。
+本專案啟發自 [WenXiaoWendy/cyberboss](https://github.com/WenXiaoWendy/cyberboss)，時間軸功能使用 [WenXiaoWendy/timeline-for-agent](https://github.com/WenXiaoWendy/timeline-for-agent)。感謝原作者與貢獻者。
 
 ---
 
@@ -184,6 +198,20 @@ On Termux, use `~/telealien` and start with:
 ```bash
 bash scripts/termux/start-telealien.sh
 ```
+
+### Update Termux from GitHub
+
+After `git push origin main` on your computer, run in Termux:
+
+```bash
+cd ~/telealien
+git pull --ff-only origin main
+npm ci
+pkill -f 'telealien.js' || true
+bash scripts/termux/start-telealien.sh
+```
+
+Git ignores `.env`, so this does not overwrite credentials. If `git pull --ff-only` fails because there are local code changes, inspect them with `git status` and resolve them first; do not force-overwrite them.
 
 Edit `.env` with `nano .env`. Never commit it: it contains private credentials.
 
