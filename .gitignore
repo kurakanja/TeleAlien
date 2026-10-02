@@ -1,6 +1,9 @@
 node_modules/
 .env
 .telealien/
+gemini-character.md
+gemini-user.md
+gemini-user.md.bak
 .DS_Store
 .env
 .mcp.json

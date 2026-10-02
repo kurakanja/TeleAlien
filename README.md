@@ -29,7 +29,7 @@ TeleAlien 是一個只供自己私訊使用的 Telegram + Gemini 助手。它可
 ```bash
 git clone https://github.com/<你的帳號>/telealien.git
 cd telealien
-npm install
+npm install --allow-git=all
 cp .env.example .env
 ```
 
@@ -47,19 +47,33 @@ bash scripts/termux/start-telealien.sh
 npm run start
 ```
 
+### 從電腦推送到 GitHub
+
+本專案的 GitHub 倉庫是 [kurakanja/TeleAlien](https://github.com/kurakanja/TeleAlien)。每次完成修改並確認測試後，在電腦專案資料夾執行：
+
+```bash
+git status --short
+git add -A
+git commit -m "說明這次修改"
+git push origin main
+```
+
+先確認 `git status --short` 的清單只包含要推送的程式與文件；`.env`、`.telealien/`、角色檔與共同記憶檔已被忽略，不會被 `git add -A` 加入。若顯示 `nothing to commit`，代表沒有新修改可推送。
+
 ### 從 GitHub 更新到 Termux
 
-在電腦 `git push origin main` 後，打開 Termux 執行：
+在電腦 `git push origin main` 後，打開 Termux 執行。先看 `git status --short`：若輸出為空，才繼續更新；有輸出表示手機端有程式碼改動，先自行備份或提交。
 
 ```bash
 cd ~/telealien
+git status --short
 git pull --ff-only origin main
 npm ci --allow-git=all
 pkill -f 'telealien.js' || true
 bash scripts/termux/start-telealien.sh
 ```
 
-`.env` 被 Git 忽略，因此不會被此流程覆寫。新版 npm 預設拒絕 Git 來源套件，因此 `--allow-git=all` 只在這次安裝時允許本專案鎖定的 GitHub 時間軸套件；不會更改全域 npm 設定。`git pull --ff-only` 若因 Termux 程式檔案的未提交變更而失敗，先用 `git status` 查看並處理該些變更，不要強制覆寫。
+`git pull --ff-only` 只更新 Git 追蹤的程式檔，且遇到衝突會停止，不會強制覆寫。`.env`、預設狀態資料夾 `~/.telealien/`（對話、提醒、活動紀錄），以及在 `.env` 指定的外部角色／共同記憶檔，皆不受上述更新影響；`npm ci` 只重建 `node_modules/`。切勿在 Termux 對此專案執行 `git reset --hard` 或 `git clean -fd`。新版 npm 預設拒絕 Git 來源套件，因此 `--allow-git=all` 只在這次安裝時允許本專案鎖定的 GitHub 時間軸套件，不會更改全域 npm 設定。
 
 ### 設定 `.env`
 
@@ -95,7 +109,7 @@ bash scripts/termux/start-telealien.sh
 | Bot 資料位置 | `TELEALIEN_STATE_DIR` | 預設 `~/.telealien`，保存短期對話、提醒和活動資料。 |
 | 自訂 Telegram API 位址 | `TELEGRAM_API_BASE_URL` | 一般不需設定。 |
 
-**回覆與提醒時間：** 提醒佇列約每 20 秒檢查一次（Bot 必須持續運作）；一般 Gemini 回覆沒有固定秒數，取決於網路與 API。
+**回覆與提醒時間：** 提醒佇列約每 20 秒檢查一次（Bot 必須持續運作）；一般 Gemini 回覆沒有固定秒數，取決於網路與 API。若同一對話收到 503，TeleAlien 會只保留最近最多 8 筆對話內容，等待 1 秒後重試一次。背景網路錯誤會寫入日誌並傳送通知給允許的 Telegram 使用者，Bot 會繼續運作。
 
 ### 角色與共同記憶：直接在手機檔案管理員編輯
 
@@ -190,7 +204,7 @@ TeleAlien is a private Telegram + Gemini assistant for personal direct messages.
 ```bash
 git clone https://github.com/<your-account>/telealien.git
 cd telealien
-npm install
+npm install --allow-git=all
 cp .env.example .env
 npm run start
 ```
@@ -201,19 +215,33 @@ On Termux, use `~/telealien` and start with:
 bash scripts/termux/start-telealien.sh
 ```
 
+### Push changes from your computer
+
+The repository is [kurakanja/TeleAlien](https://github.com/kurakanja/TeleAlien). After testing a change, run from the project directory:
+
+```bash
+git status --short
+git add -A
+git commit -m "Describe the change"
+git push origin main
+```
+
+Review `git status --short` first. `.env`, `.telealien/`, and the local character/memory files are ignored and are not added by `git add -A`.
+
 ### Update Termux from GitHub
 
-After `git push origin main` on your computer, run in Termux:
+After `git push origin main` on your computer, run in Termux. Continue only if `git status --short` has no output; otherwise, back up or commit your local code changes first.
 
 ```bash
 cd ~/telealien
+git status --short
 git pull --ff-only origin main
 npm ci --allow-git=all
 pkill -f 'telealien.js' || true
 bash scripts/termux/start-telealien.sh
 ```
 
-Git ignores `.env`, so this does not overwrite credentials. Newer npm versions reject Git dependencies by default, so `--allow-git=all` permits this project's pinned GitHub timeline package only for this install; it does not change global npm configuration. If `git pull --ff-only` fails because there are local code changes, inspect them with `git status` and resolve them first; do not force-overwrite them.
+`git pull --ff-only` updates only Git-tracked code and stops on conflicts; it never force-overwrites files. It does not affect `.env`, the default `~/.telealien/` state directory (conversations, reminders, and activity records), or external character/memory files configured in `.env`. `npm ci` rebuilds only `node_modules/`. Never run `git reset --hard` or `git clean -fd` in this project on Termux. Newer npm versions reject Git dependencies by default, so `--allow-git=all` permits this project's pinned GitHub timeline package only for this install; it does not change global npm configuration.
 
 Edit `.env` with `nano .env`. Never commit it: it contains private credentials.
 
@@ -245,7 +273,7 @@ bash scripts/termux/start-telealien.sh
 | State directory | `TELEALIEN_STATE_DIR` | Default: `~/.telealien`. |
 | Activity monitor | `TELEALIEN_ACTIVITY_*` | Optional; see below. |
 
-`/new` clears only short-term context. `/memory` displays shared memory. Memory updates keep a `.bak` copy. Reminder checks run about every 20 seconds while the bot is running; normal Gemini response timing depends on network and API availability.
+`/new` clears only short-term context. `/memory` displays shared memory. Memory updates keep a `.bak` copy. Reminder checks run about every 20 seconds while the bot is running; normal Gemini response timing depends on network and API availability. If Gemini returns 503 for a conversation, TeleAlien keeps up to its most recent eight conversation entries, waits one second, and retries once. Background network failures are logged and sent to allowed Telegram users; the bot continues running.
 
 ### Edit character and memory from the phone
 

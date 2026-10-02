@@ -14,6 +14,7 @@ class TelegramGeminiApp {
     this.activityTracker = new AppActivityTracker(config);
     this.history = this.loadHistory();
     this.running = false;
+    this.lastFailureNotificationAt = 0;
   }
 
   loadHistory() {
@@ -27,6 +28,7 @@ class TelegramGeminiApp {
 
   async start() {
     this.running = true;
+    this.installProcessErrorHandlers();
     this.startActivityServer();
     this.startReminderLoop();
     this.startCheckinLoop();
@@ -65,8 +67,21 @@ class TelegramGeminiApp {
 
   async reply(userId, text, { proactive = false } = {}) {
     let contents = [...(Array.isArray(this.history[userId]) ? this.history[userId] : []), { role: "user", parts: [{ text }] }];
+    let retriedAfter503 = false;
     for (let round = 0; round < 6; round += 1) {
-      const result = await this.generate(contents, { proactive });
+      let result;
+      try { result = await this.generate(contents, { proactive }); }
+      catch (error) {
+        if (!retriedAfter503 && isServiceUnavailable(error) && contents.length > 2) {
+          retriedAfter503 = true;
+          contents = keepRecentContents(contents);
+          console.warn("[telealien] Gemini 503: retrying once with recent conversation history only.");
+          await wait(1_000);
+          round -= 1;
+          continue;
+        }
+        throw error;
+      }
       const parts = result?.candidates?.[0]?.content?.parts || [];
       const calls = parts.filter((part) => part.functionCall);
       if (!calls.length) {
@@ -133,7 +148,9 @@ class TelegramGeminiApp {
         console.warn(`[telealien] Gemini key ${index + 1}/${keys.length} unavailable (${error.status || "network"}); trying the next key.`);
       }
     }
-    throw new Error(`\u6240\u6709 Gemini API \u91d1\u9470\u90fd\u7121\u6cd5\u4f7f\u7528\uff1a${lastError?.message || "\u672a\u77e5\u932f\u8aa4"}`);
+    const error = new Error(`\u6240\u6709 Gemini API \u91d1\u9470\u90fd\u7121\u6cd5\u4f7f\u7528\uff1a${lastError?.message || "\u672a\u77e5\u932f\u8aa4"}`);
+    error.status = lastError?.status;
+    throw error;
   }
 
   async invokeFunction(userId, name, args) {
@@ -168,9 +185,11 @@ class TelegramGeminiApp {
     const schedule = async () => {
       const min = Number(match[1]); const max = Number(match[2]);
       await wait((min + Math.floor(Math.random() * (max - min + 1))) * 60_000);
+      try {
       const trigger = `[\u7cfb\u7d71\u63d0\u793a:\u73fe\u5728\u662f${formatLocalTime(Date.now(), this.config.timeZone)}\uff0c\u662f\u6642\u5019\u767c\u8a0a\u606f\u7d66\u672c\u9ad4\u4e86]`;
       for (const userId of this.config.allowedUserIds) await this.reply(String(userId), trigger);
-      if (this.running) void schedule();
+      } catch (error) { this.reportBackgroundFailure("check-in", error); }
+      finally { if (this.running) void schedule(); }
     };
     void schedule();
   }
@@ -201,6 +220,21 @@ class TelegramGeminiApp {
   }
 
   activityNudgeGapMs() { return this.config.activityNudgeGapMinutes * 60_000; }
+
+  installProcessErrorHandlers() {
+    const report = (kind, error) => this.reportBackgroundFailure(kind, error);
+    process.on("unhandledRejection", (error) => report("unhandled rejection", error));
+    process.on("uncaughtException", (error) => report("uncaught exception", error));
+  }
+
+  reportBackgroundFailure(kind, error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error(`[telealien] ${kind} failed: ${message}`);
+    const now = Date.now();
+    if (now - this.lastFailureNotificationAt < 60_000) return;
+    this.lastFailureNotificationAt = now;
+    void Promise.all(this.config.allowedUserIds.map((userId) => this.channel.sendText({ userId: String(userId), text: `TeleAlien \u80cc\u666f\u932f\u8aa4\uff1a${kind}\u3002Bot \u4ecd\u5728\u904b\u4f5c\uff1b${message.slice(0, 300)}` }))).catch((notifyError) => console.error(`[telealien] failure notification failed: ${notifyError.message}`));
+  }
 
   async handleActivityNudge(signal) {
     if (!this.config.activityNudgesEnabled || !signal || !this.config.allowedUserIds.length) return;
@@ -254,6 +288,12 @@ function wait(ms) { return new Promise((resolve) => setTimeout(resolve, ms)); }
 function readTextFile(filePath) { try { return fs.readFileSync(filePath, "utf8").trim(); } catch { return ""; } }
 function formatLocalTime(value, timeZone) { return new Intl.DateTimeFormat("zh-TW", { timeZone, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date(value)).replace(/\//g, "-"); }
 function isRotatableGeminiKeyError(error) { return [400, 401, 403, 429, 500, 502, 503, 504].includes(Number(error?.status)); }
+function isServiceUnavailable(error) { return Number(error?.status) === 503; }
+function keepRecentContents(contents) {
+  const recent = Array.isArray(contents) ? contents.slice(-8) : [];
+  const firstUser = recent.findIndex((item) => item?.role === "user");
+  return firstUser < 0 ? recent : recent.slice(firstUser);
+}
 function normalizeDeliveryMessages(value) { return Array.isArray(value) ? value.map((item) => String(item || "").trim()).filter(Boolean).slice(0, 4) : []; }
 function readJsonBody(request) {
   return new Promise((resolve, reject) => {
@@ -275,4 +315,4 @@ function respondActivityDashboard(response, activity) {
 }
 function escapeHtml(value) { return String(value).replace(/[&<>'"]/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[character]); }
 
-module.exports = { TelegramGeminiApp };
+module.exports = { TelegramGeminiApp, isServiceUnavailable, keepRecentContents };

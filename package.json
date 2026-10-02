@@ -11,7 +11,7 @@
     "start": "node ./bin/telealien.js start",
     "postinstall": "node ./scripts/patch-timeline-for-termux.js",
     "patch:timeline": "node ./scripts/patch-timeline-for-termux.js",
-    "check": "node --check ./src/index.js && node --check ./src/core/config.js && node --check ./src/core/reminder-queue-store.js && node --check ./src/app/telegram-gemini-app.js && node --check ./src/adapters/channel/telegram/index.js && node --check ./src/services/app-activity-tracker.js && node --check ./src/integrations/timeline/index.js"
+    "check": "node --check ./src/index.js && node --check ./src/core/config.js && node --check ./src/core/reminder-queue-store.js && node --check ./src/app/telegram-gemini-app.js && node --check ./src/adapters/channel/telegram/index.js && node --check ./src/services/app-activity-tracker.js && node --check ./src/integrations/timeline/index.js && node ./test/telegram-gemini-app.test.js"
   },
   "dependencies": {
     "dotenv": "^16.4.7",
